@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles/style.css">
+    <title>Dashboard</title>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="burger">
+            <span class="line"></span>
+        </div>
+        <h2 class="sidebar_title">Period</h2>
+        <div class="form_date">
+            <select class="select" name="month" id="month">
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4" selected>April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+            <select class="select" name="year" id="year">
+                <option value="2025">2025</option>
+                <option value="2026" selected>2026</option>
+                <option value="2027">2027</option>
+            </select>
+        </div>
+        <div class="wrapper">
+            <div class="projects">
+                <h2 class="title">Projects</h2>
+            </div>
+            <div class="employees">
+                <h2 class="title">Employees</h2>
+            </div>
+        </div>
+    </aside>
+    <main class="main">
+        <button class="toggle-sidebar">
+            <img src="assets/img/arrow.png" alt="arrow" width="50">
+        </button>
+        <div class="container_projects active">
+            <header class="header">
+                <h1>Projects</h1>
+                <div class="header_wrapper">
+                    <button class="header_button header_button_add">+ Add Project</button>
+                    <button class="header_button header_button_seed">Seed Data</button>
+                </div>
+            </header>
+            <table class="table_projects table_projects_projects" id="projectsTable">
+                <thead>
+                    <tr>
+                        <th data-field="company">Company Name <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th data-field="name">Project Name <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th data-field="budget">Budjet <span>↓</span></th>
+                        <th data-field="capacity">Employee Capacity <span>↑</span><span>↓</span></th>
+                        <th>Employees</th>
+                        <th data-field="income">Estimated Income <span>↑</span><span>↓</span></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <p class="total">Total Estimated Income: <span>$0.00</span></p>
+        </div>
+        <div class="container_employees">
+            <header class="header">
+                <h1>Employees</h1>
+                <div class="header_wrapper">
+                    <button class="header_button header_button_employee">+ Add Employee</button>
+                </div>
+            </header>
+            <table class="table_projects table_projects_employees" id="employeesTable">
+                <thead>
+                    <tr>
+                        <th data-field="name">Name <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th data-field="surname">Surname <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th data-field="dob">Age <span>↑</span><span>↓</span></th>
+                        <th data-field="position">Position <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th data-field="salary">Salary <span>↑</span><span>↓</span></th>
+                        <th>Estimated Payment <span>↑</span><span>↓</span></th>
+                        <th>Project <span>↑</span><span>↓</span><img src="assets/img/images-Photoroom.png" alt="" width="40"></th>
+                        <th>Projected Income <span>↑</span><span>↓</span></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+            <form class="form form_project" id="projectForm">
+                <h2 class="form__title">Add New Project</h2>
+
+                <label for="project">Project Name: <span>*</span></label>
+                <input type="text" id="project" name="project" required>
+
+                <label for="company">Company Name: <span>*</span></label>
+                <input type="text" id="company" name="company" required>
+
+                <label for="budget">Budget: <span>*</span></label>
+                <input type="number" id="budget" name="budget" required>
+
+                <label for="capacity">Employee Capacity: <span>*</span></label>
+                <input type="number" id="capacity" name="capacity" required>
+
+                <div class="btn__wrapper">
+                    <button class="btn_submit btn_submit_project" type="submit">Add</button>
+                    <button class="btn_reset btn_reset_project" type="reset">Cancel</button>
+                </div>
+            </form>
+            <form class="form form_employee" id="employeeForm">
+                <h2 class="form__title">Add New Employee</h2>
+
+                <label for="name">Name: <span>*</span></label>
+                <input type="text" id="empName">
+
+                <label for="surname">Surname: <span>*</span></label>
+                <input type="text" id="empSurname">
+
+                <label for="birthday">Date of Birth: <span>*</span></label>
+                <input type="date" id="empBirthday">
+
+                <label for="company">Position: <span>*</span></label>
+                <select id="empPosition">
+                    <option value="Junior">Junior</option>
+                    <option value="Middle">Middle</option>
+                    <option value="Senior">Senior</option>
+                </select>
+
+                <label for="budjet">Salary: <span>*</span></label>
+                <input type="text" id="empSalary">
+
+                <div class="btn__wrapper">
+                    <button class="btn_submit btn_submit_employee" type="submit">Add</button>
+                    <button class="btn_reset btn_reset_employee" type="reset">Cancel</button>
+                </div>
+            </form>
+            <div class="popup popup_data">
+                <div class="modal__wrapper">
+                    <div class="modal__header">
+                        <h2 class="modal__title">Seed Data from Month</h2>
+                        <span class="modal__close"></span>
+                    </div>
+                    <div class="modal__main">
+                        <p class="modal__main_text">Select a month to copy its data to the current month (<span>April 2026</span>):</p>
+                        <table class="modal__table">
+                            <thead>
+                                <tr>
+                                    <th>Year</th>
+                                    <th>Month</th>
+                                    <th>Project</th>
+                                    <th>Total Est. Income</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><button class="modal__btn_data">Seed</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- /////////////////////////////////////// -->
+            <div class="popup popup_employees" id="employeesPopup">
+                <div class="modal__wrapper">
+                    <div class="modal__header">
+                        <h2 class="modal__title">Employees on Mobile Banking App</h2>
+                        <span class="modal__close"></span>
+                    </div>
+                    <div class="modal__main">
+                        <table class="modal__table">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Capacity</th>
+                                    <th>Fit</th>
+                                    <th>Vacation</th>
+                                    <th>Effective</th>
+                                    <th>Revenue</th>
+                                    <th>Cost</th>
+                                    <th>Profit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><button class="modal__btn_employees">Seed</button>
+                                    <button class="unassign-btn" data-emp="${emp.id}" data-project="${project.id}">Unassign</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- //////////////////////////////////////// -->
+
+    </main>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

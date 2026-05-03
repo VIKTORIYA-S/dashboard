@@ -1,0 +1,71 @@
+// console.log("🔥 assignments.js IS EXECUTING");
+
+import { getData, saveData } from "./storage.js";
+
+export function assignEmployeeToProject(period, employeeId, projectId) {
+  const data = getData(period);
+
+  const employee = data.employees.find((e) => String(e.id) === String(employeeId));
+
+if (!employee) {
+  console.log("❌ EMPLOYEE NOT FOUND", employeeId);
+  return;
+}
+  console.log("DATA:", data);
+  console.log("EMPLOYEES:", data.employees);
+  console.log("EMPLOYEE ID:", employeeId);
+
+  if (!employee.assignments) {
+    employee.assignments = [];
+  }
+
+  const exists = (employee.assignments || []).find(
+    (a) => a.projectId === projectId,
+  );
+  if (exists) return;
+
+  const used = employee.assignments.reduce(
+    (sum, a) => sum + Number(a.capacity),
+    0,
+  );
+
+  const newCapacity = 1;
+
+  if (used + newCapacity > 1.5) {
+    alert("Employee capacity limit exceeded (1.5)");
+    return;
+  }
+
+  console.log("EMPLOYEE BEFORE PUSH:", employee);
+  employee.assignments.push({
+    projectId,
+    capacity: newCapacity,
+    fit: 0.5,
+  });
+
+  console.log("AFTER ASSIGN:", employee.assignments);
+  console.log("ALL EMPLOYEES:", data.employees);
+
+  saveData(period, data);
+  console.log("RAW STORAGE:", localStorage.getItem("monthlyData"));
+}
+
+export function removeAssignment(period, employeeId, projectId) {
+  const data = getData(period);
+
+  const emp = data.employees.find((e) => e.id === employeeId);
+  if (!emp) return;
+
+  emp.assignments = emp.assignments.filter((a) => a.projectId !== projectId);
+
+  saveData(period, data);
+}
+
+export function getAvailability(emp) {
+  const used = emp.assignments?.reduce((sum, a) => sum + a.capacity, 0) || 0;
+
+  return {
+    used,
+    available: 1.5 - used,
+  };
+}
