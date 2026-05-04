@@ -1,7 +1,7 @@
 
 const STORAGE_KEY = "monthlyData";
 
-function loadAllData() {
+export function loadAllData() {
   return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 }
 

@@ -1,6 +1,7 @@
 // console.log("🔥 assignments.js IS EXECUTING");
 
 import { getData, saveData } from "./storage.js";
+import { loadAllData } from "./storage.js";
 
 export function assignEmployeeToProject(period, employeeId, projectId) {
   console.log("ASSIGN CALLED", employeeId, projectId);
@@ -66,7 +67,7 @@ export function assignEmployeeToProject(period, employeeId, projectId) {
   console.log("ALL EMPLOYEES:", data.employees);
 
   saveData(period, data);
-  console.log("SAVED:", loadAllData());
+  console.log("SAVED:", getllData(period));
   console.log("RAW STORAGE:", localStorage.getItem("monthlyData"));
 }
 
@@ -79,6 +80,8 @@ export function removeAssignment(period, employeeId, projectId) {
   emp.assignments = emp.assignments.filter((a) => a.projectId !== projectId);
 
   saveData(period, data);
+  rerender();
+  refreshProjectPopup();
 }
 
 export function getAvailability(emp) {

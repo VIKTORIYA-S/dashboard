@@ -68,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
       vacationDays: Number(document.getElementById("empVacation")?.value) || 0,
     };
 
-    console.log(employee);
     addEmployee(getCurrentPeriod(), employee);
 
     form.classList.remove("open");

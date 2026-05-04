@@ -259,23 +259,23 @@ function openEmployeesPopup(emp, period) {
   renderEmployeeProjects(emp.id, period);
 }
 
-function openProjectPopup(projectId, period) {
-  const data = getData(period);
+// function openProjectPopup(projectId, period) {
+//   const data = getData(period);
 
-  const project = data.projects.find((p) => String(p.id) === String(projectId));
-console.log("OPEN PROJECT:", project);
-  const popup = document.querySelector("#projectPopup");
+//   const project = data.projects.find((p) => String(p.id) === String(projectId));
+// console.log("OPEN PROJECT:", project);
+//   const popup = document.querySelector("#projectPopup");
 
-  if (!popup) return;
+//   if (!popup) return;
 
-  popup.classList.add("open");
+//   popup.classList.add("open");
 
-  document.querySelector("#projectPopupTitle").textContent =
-    `Employees on ${project?.name || "-"}`;
+//   document.querySelector("#projectPopupTitle").textContent =
+//     `Employees on ${project?.name || "-"}`;
 
-  // popup.classList.remove("open");
-  renderProjectEmployees(projectId, period);
-}
+//   // popup.classList.remove("open");
+//   renderProjectEmployees(projectId, period);
+// }
 
 
 
@@ -520,4 +520,26 @@ function renderPopupTable({ mode, id, period }) {
     `;
   });
 }
+}
+
+
+let currentProjectId = null;
+let currentPeriod = null;
+function openProjectPopup(project, period) {
+  currentProjectId = project.id;
+  currentPeriod = period;
+
+  const popup = document.querySelector("#projectPopup");
+  popup.classList.add("open");
+
+  document.querySelector("#projectPopupTitle").textContent =
+    `Employees on ${project.name}`;
+
+  renderProjectEmployees(project.id, period);
+}
+
+export function refreshProjectPopup() {
+  if (!currentProjectId || !currentPeriod) return;
+
+  renderProjectEmployees(currentProjectId, currentPeriod);
 }
