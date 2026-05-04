@@ -176,7 +176,37 @@
             <div class="popup popup_employees" id="employeesPopup">
                 <div class="modal__wrapper">
                     <div class="modal__header">
-                        <h2 class="modal__title">Employees on Mobile Banking App</h2>
+                        <h2 class="modal__title" id="employeePopupTitle"></h2>
+                        <span class="modal__close"></span>
+                    </div>
+                    <div class="modal__main">
+                        <table class="modal__table">
+                            <thead>
+                                <tr>
+                                    <th>Project</th>
+                                    <th>Capacity</th>
+                                    <th>Fit</th>
+                                    <th>Vacation</th>
+                                    <th>Effective</th>
+                                    <th>Revenue</th>
+                                    <th>Cost</th>
+                                    <th>Profit</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employeeProjectsBody"></tbody>
+                                    <!-- <td><button class="modal__btn_employees">Seed</button>
+                                    <button class="unassign-btn" data-emp="${emp.id}" data-project="${project.id}">Unassign</button></td>
+                                </tr> -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="popup popup_employees" id="projectPopup">
+                <div class="modal__wrapper">
+                    <div class="modal__header">
+                        <h2 class="modal__title" id="projectPopupTitle"></h2>
                         <span class="modal__close"></span>
                     </div>
                     <div class="modal__main">
@@ -194,25 +224,16 @@
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td><button class="modal__btn_employees">Seed</button>
-                                    <button class="unassign-btn" data-emp="${emp.id}" data-project="${project.id}">Unassign</button></td>
-                                </tr>
-                            </tbody>
+                            <tbody id="projectEmployeesBody"></tbody>
+                                    <!-- <td><button class="modal__btn_employees">Seed</button>
+                                        <button class="unassign-btn" data-emp="${emp.id}"
+                                            data-project="${project.id}">Unassign</button>
+                                    </td>
+                                </tr> -->
                         </table>
                     </div>
                 </div>
             </div>
-            <!-- //////////////////////////////////////// -->
 
     </main>
     <script type="module" src="./main.js"></script>

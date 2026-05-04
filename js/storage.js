@@ -12,9 +12,25 @@ function saveAllData(data) {
 
 
 // получить данные месяца
+// export function getData(period) {
+//   const all = loadAllData();
+//   return all[period] || { employees: [], projects: [] };
+// }
 export function getData(period) {
-  const all = loadAllData();
-  return all[period] || { employees: [], projects: [] };
+  // console.log("DATA:", getData(period));
+  // console.log("PROJECTS:", getData(period).projects);
+  const monthlyData = loadAllData();
+
+  const data = monthlyData[period];
+
+  if (!data) {
+    return { employees: [], projects: [] };
+  }
+
+  return {
+    employees: data.employees ?? [],
+    projects: data.projects ?? [],
+  };
 }
 
 // сохранить данные месяца
@@ -56,7 +72,6 @@ export function initData(period) {
   }
 }
 
-// ////////////////////////////////////////////////
 
 
 

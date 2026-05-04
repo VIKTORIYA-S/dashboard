@@ -3,25 +3,23 @@ import { deleteEmployee } from "./employees.js";
 import { deleteProject } from "./projects.js";
 import { getAvailability, assignEmployeeToProject } from "./assignments.js";
 
-
-
 let currentSortField = null;
 let sortDirection = "asc";
+const norm = (v) => String(v);
 
 export function renderEmployees(period) {
-    const data = getData(period);
+  const data = getData(period);
   // console.log(data);
   const options = data.projects
     .map((p) => `<option value="${p.id}">${p.name}</option>`)
     .join("");
-    const tbody = document.querySelector("#employeesTable tbody");
+  const tbody = document.querySelector("#employeesTable tbody");
 
   tbody.innerHTML = "";
 
-    // 👇 защита от дублирования
+  // 👇 защита от дублирования
   tbody.onclick = (event) => {
-    console.log("CLICK DETECTED:", event.target);
-    console.log("CURRENT TARGET:", event.currentTarget);
+
     const showBtn = event.target.closest(".show-btn");
     const assignBtn = event.target.closest(".assign-btn");
 
@@ -35,7 +33,7 @@ export function renderEmployees(period) {
       console.log("ABOUT TO CALL ASSIGN");
 
       const id = assignBtn.dataset.id;
-      // const data = getData(period);
+      const data = getData(period);
       const options = data.projects
         .map((p) => `<option value="${p.id}">${p.name}</option>`)
         .join("");
@@ -82,6 +80,8 @@ export function renderEmployees(period) {
   };
 
   data.employees.forEach((emp) => {
+      console.log("EMP:", emp.name, emp.assignments);
+
     const tr = document.createElement("tr");
 
     const { used } = getAvailability(emp);
@@ -122,8 +122,8 @@ export function renderEmployees(period) {
       </td>
     `;
 
-      tbody.appendChild(tr);
-      // console.log(data.employees);
+    tbody.appendChild(tr);
+    // console.log(data.employees);
   });
 }
 
@@ -133,33 +133,31 @@ function calculateAge(dob) {
   return Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
 }
 
-
 function handleDelete(e, period) {
   if (e.target.classList.contains("delete-btn")) {
     const id = e.target.dataset.id;
 
     deleteEmployee(period, id);
-      rerender();
+    rerender();
   }
 }
 
-
 export function renderProjects(period) {
-    const data = getData(period);
-    const tbody = document.querySelector("#projectsTable tbody");
+  const data = getData(period);
+  const tbody = document.querySelector("#projectsTable tbody");
 
-    tbody.innerHTML = "";
+  tbody.innerHTML = "";
 
   tbody.onclick = (event) => {
-      const deleteBtn = event.target.closest(".delete-btn");
+    const deleteBtn = event.target.closest(".delete-btn");
     const showEmployeesBtn = event.target.closest(".show-employees-btn");
-    
-      if (deleteBtn) {
-        const id = deleteBtn.dataset.id;
 
-        deleteProject(period, id);
-        rerender();
-        return; // 👈 важно
+    if (deleteBtn) {
+      const id = deleteBtn.dataset.id;
+
+      deleteProject(period, id);
+      rerender();
+      return; // 👈 важно
     }
     if (showEmployeesBtn) {
       const projectId = showEmployeesBtn.dataset.id;
@@ -171,39 +169,39 @@ export function renderProjects(period) {
     }
   };
 
-    data.projects.forEach((project) => {
-      const tr = document.createElement("tr");
+  data.projects.forEach((project) => {
+    const tr = document.createElement("tr");
 
-      // console.log(data.employees);
+const norm = (v) => String(v);
+    const assignedEmployees = data.employees.filter(
+      (emp) =>
+        emp.assignments?.some((a) => norm(a.projectId) === norm(project.id)),
+    );
+    // console.log(assignedEmployees);
+    // console.log("ASSIGNED TO PROJECT:", assignedEmployees);
 
-      const assignedEmployees = data.employees.filter((emp) =>
-        emp.assignments.some((a) => String(a.projectId) === String(project.id)),
+    const used = assignedEmployees.reduce((sum, emp) => {
+      const assignment = emp.assignments.find(
+        (a) => String(a.projectId) === String(project.id),
       );
-      // console.log(assignedEmployees);
-      // console.log("ASSIGNED TO PROJECT:", assignedEmployees);
 
-      const used = assignedEmployees.reduce((sum, emp) => {
-        const assignment = emp.assignments.find(
-          (a) => String(a.projectId) === String(project.id),
-        );
+      // console.log("project.id:", project.id);
+      // console.log(data.employees.map((e) => e.assignments));
+      // console.log(data.employees.flatMap((e) => e.assignments));
 
-        // console.log("project.id:", project.id);
-        // console.log(data.employees.map((e) => e.assignments));
-        // console.log(data.employees.flatMap((e) => e.assignments));
+      if (!assignment) return sum;
 
-        if (!assignment) return sum;
+      const capacity = Number(assignment.capacity) || 0;
+      const fit = Number(assignment.fit) || 0;
 
-        const capacity = Number(assignment.capacity) || 0;
-        const fit = Number(assignment.fit) || 0;
+      const effective = capacity * fit;
 
-        const effective = capacity * fit;
+      // console.log({ capacity, fit, effective });
 
-        // console.log({ capacity, fit, effective });
+      return sum + effective;
+    }, 0);
 
-        return sum + effective;
-      }, 0);
-
-        tr.innerHTML = `
+    tr.innerHTML = `
             <td>${project.company}</td>
             <td>${project.name}</td>
             <td>${project.budget}</td>
@@ -215,62 +213,85 @@ export function renderProjects(period) {
             <td><button data-id="${project.id}" class="delete-btn">Delete</button></td>
         `;
 
-        tbody.appendChild(tr);
-      // console.log(data.projects);
-      console.log(data.employees[0]);
-    });
-  
+    tbody.appendChild(tr);
+    // console.log(data.projects);
+  });
+
   tbody.onclick = null; // очистить старый
   tbody.onclick = (event) => {
     const btn = event.target.closest(".show-employees-btn");
 
     if (btn) {
       const projectId = btn.dataset.id;
+
+       console.log("CLICK PROJECT ID:", projectId);
       openEmployeesPopup(projectId, period);
+      openProjectPopup(
+    { id: projectId }, // 👈 ВАЖНО
+    period
+  );
+
     }
   };
 }
 
+// function openEmployeesPopup(projectId, period) {
+//   console.log("OPEN POPUP PERIOD:", period);
+//   console.log("PROJECT ID:", projectId);
+//   const popup = document.querySelector("#employeesPopup");
 
-function openEmployeesPopup(projectId, period) {
-  console.log("OPEN POPUP PERIOD:", period);
-  console.log("PROJECT ID:", projectId);
+//   popup.classList.add("open");
+
+//   renderProjectEmployees(projectId, period);
+// }
+
+function openEmployeesPopup(emp, period) {
   const popup = document.querySelector("#employeesPopup");
+
+  if (!popup) return;
 
   popup.classList.add("open");
 
+  document.querySelector("#employeePopupTitle").textContent =
+    `Assignment for ${emp.name}`;
+
+  renderEmployeeProjects(emp.id, period);
+}
+
+function openProjectPopup(projectId, period) {
+  const data = getData(period);
+
+  const project = data.projects.find((p) => String(p.id) === String(projectId));
+console.log("OPEN PROJECT:", project);
+  const popup = document.querySelector("#projectPopup");
+
+  if (!popup) return;
+
+  popup.classList.add("open");
+
+  document.querySelector("#projectPopupTitle").textContent =
+    `Employees on ${project?.name || "-"}`;
+
+  popup.classList.remove("open");
   renderProjectEmployees(projectId, period);
 }
 
 
+
 function renderProjectEmployees(projectId, period) {
-  const data = getData(period); // или period, если у тебя так
+  const data = getData(period);
 
-  console.log("DATA FROM STORAGE:", data);
-  console.log("EMPLOYEES TYPE:", typeof data?.employees);
-  console.log("EMPLOYEES:", data?.employees);
-  // //////////////////////////////////////////////
-  //добавила временно
-  console.log("PROJECT ID:", projectId);
+  const norm = (v) => String(v);
 
-  data.employees.forEach((emp) => {
-    console.log("EMP:", emp.name, emp.assignments);
-  });
-// ////////////////////////////////////////////////
-  const tbody = document.querySelector("#employeesPopup tbody");
+  const tbody = document.querySelector("#projectEmployeesBody");
 
-  if (!tbody) {
-    console.log("❌ tbody не найден");
-    return;
-  }
+  if (!tbody) return;
 
-  tbody.innerHTML = ""; // ❗ очищаем, чтобы не было дублей
+  tbody.innerHTML = "";
 
   const assignedEmployees = data.employees.filter((emp) =>
-    emp.assignments?.some((a) => String(a.projectId) === String(projectId)),
+    emp.assignments?.some((a) => norm(a.projectId) === norm(projectId)),
   );
-
-  console.log("ASSIGNED TO PROJECT:", assignedEmployees);
 
   if (assignedEmployees.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9">No employees assigned</td></tr>`;
@@ -280,34 +301,64 @@ function renderProjectEmployees(projectId, period) {
   const rows = assignedEmployees
     .map((emp) => {
       const a = emp.assignments.find(
-        (a) => String(a.projectId) === String(projectId),
+        (a) => norm(a.projectId) === norm(projectId),
       );
 
       return `
-      <tr>
-        <td>${emp.name}</td>
-        <td>${a.capacity}</td>
-        <td>${a.fit}</td>
-        <td>-</td>
-        <td>${(a.capacity * a.fit).toFixed(2)}</td>
-        <td>-</td>
-        <td>-</td>
-        <td>-</td>
-        <td>
-          <button class="unassign-btn"
-            data-emp="${emp.id}"
-            data-project="${projectId}">
-            Unassign
-          </button>
-        </td>
-      </tr>
-    `;
+        <tr>
+          <td>${emp.name}</td>
+          <td>${a.capacity}</td>
+          <td>${a.fit}</td>
+          <td>-</td>
+          <td>${(a.capacity * a.fit).toFixed(2)}</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>
+            <button class="unassign-btn"
+              data-emp="${emp.id}"
+              data-project="${projectId}">
+              Unassign
+            </button>
+          </td>
+        </tr>
+      `;
     })
     .join("");
 
   tbody.innerHTML = rows;
 }
 
+
+export function renderEmployeeProjects(employeeId, period) {
+  const data = getData(period);
+
+  const tbody = document.querySelector("#employeeProjectsBody");
+  tbody.innerHTML = "";
+
+  const employee = data.employees.find(
+  
+  (e) => String(e.id) === String(employeeId),
+  );
+  
+  if (!employee?.assignments?.length) {
+    tbody.innerHTML = `<tr><td colspan="3">No projects</td></tr>`;
+    return;
+  }
+
+  employee.assignments.forEach((a) => {
+    const project = data.projects.find((p) => p.id === a.projectId);
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${project?.name || "-"}</td>
+        <td>${a.capacity || "-"}</td>
+        <td><button class="unassign-btn">Unassign</button></td>
+      </tr>
+    `;
+
+  });
+}
 
 function openAssignmentsModal(emp, data) {
   const modal = document.querySelector(".popup_employees");
@@ -318,19 +369,19 @@ function openAssignmentsModal(emp, data) {
   modalTbody.innerHTML = "";
 
   modalTbody.onclick = (e) => {
-  const btn = e.target.closest(".unassign-btn");
-  if (!btn) return;
+    const btn = e.target.closest(".unassign-btn");
+    if (!btn) return;
 
-  const empId = btn.dataset.emp;
-  const projectId = btn.dataset.project;
+    const empId = btn.dataset.emp;
+    const projectId = btn.dataset.project;
 
-  removeAssignment(period, empId, projectId);
-  rerender();
+    removeAssignment(period, empId, projectId);
+    rerender();
 
-      openAssignmentsModal(
-        data.employees.find((e) => e.id === empId),
-        getData(period),
-      );
+    openAssignmentsModal(
+      data.employees.find((e) => e.id === empId),
+      getData(period),
+    );
 
     modal.classList.remove("open");
   };
@@ -364,7 +415,6 @@ function openAssignmentsModal(emp, data) {
   modal.classList.add("open");
 }
 
-
 //закрыть модалку
 export function closeAssignmentsModal() {
   const modal = document.getElementById("employeesPopup");
@@ -382,7 +432,6 @@ export function closeAssignmentsModal() {
     }
   });
 }
-
 
 export function initUI() {
   function createAssignModal() {
@@ -403,57 +452,52 @@ export function initUI() {
   createAssignModal();
 }
 
+function renderPopupTable({ mode, id, period }) {
+  const data = getData(period);
 
-// function renderProjectEmployees(projectId, period) {
-//   const data = getData(period);
+  const tbody =
+    mode === "employee"
+      ? document.querySelector("#employeeProjectsBody")
+      : document.querySelector("#projectEmployeesBody");
 
-//   const tbody = document.querySelector("#employeesPopup tbody");
-//   if (!tbody) return;
+  tbody.innerHTML = "";
+  if (mode === "employee") {
+  const employee = data.employees.find(
+    (e) => String(e.id) === String(employeeId),
+  );
 
-//   tbody.innerHTML = "";
+  employee?.assignments?.forEach(a => {
+    const project = data.projects.find(p => p.id === a.projectId);
 
-//   const employees = data.employees.filter((emp) =>
-//     emp.assignments?.some((a) => String(a.projectId) === String(projectId)),
-//   );
+    tbody.innerHTML += `
+      <tr>
+        <td>${project?.name}</td>
+        <td>${a.capacity}</td>
+        <td>
+          <button class="unassign-btn">Unassign</button>
+        </td>
+      </tr>
+    `;
+  });
+  }
+  if (mode === "project") {
+    data.employees.forEach(emp => {
+      console.log("EMP:", e.name, e.assignments);
 
-//   if (employees.length === 0) {
-//     tbody.innerHTML = `
-//       <tr>
-//         <td colspan="9">No employees assigned</td>
-//       </tr>
-//     `;
-//     return;
-//   }
+    const assignment = emp.assignments?.find(a => a.projectId === id);
 
-//   const rows = employees
-//     .map((emp) => {
-//       const a = emp.assignments.find(
-//         (x) => String(x.projectId) === String(projectId),
-//       );
+    if (!assignment) return;
 
-//       const effective = a.capacity * a.fit;
-
-//       return `
-//       <tr>
-//         <td>${emp.name} ${emp.surname}</td>
-//         <td>${a.capacity.toFixed(2)}</td>
-//         <td>${a.fit.toFixed(2)}</td>
-//         <td>-</td>
-//         <td>${effective.toFixed(2)}</td>
-//         <td>-</td>
-//         <td>-</td>
-//         <td>-</td>
-//         <td>
-//           <button class="unassign-btn"
-//             data-emp="${emp.id}"
-//             data-project="${projectId}">
-//             Unassign
-//           </button>
-//         </td>
-//       </tr>
-//     `;
-//     })
-//     .join("");
-
-//   tbody.innerHTML = rows;
-// }
+    tbody.innerHTML += `
+      <tr>
+        <td>${emp.name}</td>
+        <td>${assignment.capacity}</td>
+        <td>${assignment.fit || "-"}</td>
+        <td>
+          <button class="unassign-btn">Unassign</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+}

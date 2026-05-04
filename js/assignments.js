@@ -11,16 +11,16 @@ if (!employee) {
   console.log("❌ EMPLOYEE NOT FOUND", employeeId);
   return;
 }
-  console.log("DATA:", data);
-  console.log("EMPLOYEES:", data.employees);
-  console.log("EMPLOYEE ID:", employeeId);
+  console.log("DATA:", getData(period));
+  console.log("PROJECTS:", getData(period).projects);
 
   if (!employee.assignments) {
     employee.assignments = [];
   }
 
+  const norm = (v) => String(v);
   const exists = (employee.assignments || []).find(
-    (a) => a.projectId === projectId,
+    (a) => norm(a.projectId) === norm(projectId)
   );
   if (exists) return;
 
@@ -38,7 +38,7 @@ if (!employee) {
 
   console.log("EMPLOYEE BEFORE PUSH:", employee);
   employee.assignments.push({
-    projectId,
+    projectId: norm(projectId),
     capacity: newCapacity,
     fit: 0.5,
   });
