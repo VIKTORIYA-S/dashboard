@@ -20,7 +20,6 @@ export function renderEmployees(period) {
 
   // 👇 защита от дублирования
   tbody.onclick = (event) => {
-
     const showBtn = event.target.closest(".show-btn");
     const assignBtn = event.target.closest(".assign-btn");
 
@@ -72,16 +71,30 @@ export function renderEmployees(period) {
 
     if (event.target.classList.contains("availability-btn")) {
       const id = event.target.dataset.id;
-      const emp = data.employees.find((emp) => emp.id === id);
 
-      const { used, available } = getAvailability(emp);
-
-      alert(`Used: ${used}\nAvailable: ${available}`);
+      openAvailabilityPopup(id, period);
     }
+
+    const closeBtn = document.querySelector(".modal__close_availability");
+    console.log(closeBtn);
+    closeBtn.addEventListener("click", (e) => {
+      console.log("CLICK FIRED");
+      e.preventDefault();
+      if (e.target === closeBtn) {
+        popup.classList.remove("open");
+        document.documentElement.classList.remove("lock");
+        document.body.classList.remove("lock");
+      }
+      if (e.target === popup) {
+        popup.classList.remove("open");
+        document.documentElement.classList.remove("lock");
+        document.body.classList.remove("lock");
+      }
+    });
   };
 
   data.employees.forEach((emp) => {
-      console.log("EMP:", emp.name, emp.assignments);
+    console.log("EMP:", emp.name, emp.assignments);
 
     const tr = document.createElement("tr");
 
@@ -104,13 +117,13 @@ export function renderEmployees(period) {
       <td>-</td>
       <td>
         <button class="show-btn" data-id="${emp.id}">
-          ${emp.assignments?.length ? `Projects (${emp.assignments.length})` : "No Projects"}
+          ${isOver ? "over" : ""} ${emp.assignments?.length ? `Projects (${emp.assignments.length})` : "No Projects"} ${used.toFixed(1)} / 1.5
         </button>
       </td>
       <td>-</td>
       <td>
-        <button class="availability-btn ${isOver ? "over" : ""}" data-id="${emp.id}">
-          ${used.toFixed(1)} / 1.5
+        <button class="availability-btn" data-id="${emp.id}">
+          Availability
         </button>
 
         <button class="assign-btn" data-id="${emp.id}">
@@ -173,10 +186,9 @@ export function renderProjects(period) {
   data.projects.forEach((project) => {
     const tr = document.createElement("tr");
 
-const norm = (v) => String(v);
-    const assignedEmployees = data.employees.filter(
-      (emp) =>
-        emp.assignments?.some((a) => norm(a.projectId) === norm(project.id)),
+    const norm = (v) => String(v);
+    const assignedEmployees = data.employees.filter((emp) =>
+      emp.assignments?.some((a) => norm(a.projectId) === norm(project.id)),
     );
     // console.log(assignedEmployees);
     // console.log("ASSIGNED TO PROJECT:", assignedEmployees);
@@ -225,13 +237,12 @@ const norm = (v) => String(v);
     if (btn) {
       const projectId = btn.dataset.id;
 
-       console.log("CLICK PROJECT ID:", projectId);
+      console.log("CLICK PROJECT ID:", projectId);
       // openEmployeesPopup(projectId, period);
       openProjectPopup(
-    { id: projectId }, // 👈 ВАЖНО
-    period
-  );
-
+        { id: projectId }, // 👈 ВАЖНО
+        period,
+      );
     }
   };
 }
@@ -265,8 +276,6 @@ export function openEmployeesPopup(employeeId, period) {
   renderEmployeeProjects(employeeId, period);
 }
 
-
-
 // function openProjectPopup(projectId, period) {
 //   const data = getData(period);
 
@@ -284,8 +293,6 @@ export function openEmployeesPopup(employeeId, period) {
 //   // popup.classList.remove("open");
 //   renderProjectEmployees(projectId, period);
 // }
-
-
 
 function renderProjectEmployees(projectId, period) {
   const data = getData(period);
@@ -337,7 +344,6 @@ function renderProjectEmployees(projectId, period) {
 
   tbody.innerHTML = rows;
 }
-
 
 export function renderEmployeeProjects(employeeId, period) {
   const data = getData(period);
@@ -466,7 +472,6 @@ export function initUI() {
     const popup = document.querySelector("#projectPopup");
     const closeBtn = popup?.querySelector(".modal__close");
 
-
     modal.id = "assignModal";
     modal.style.position = "absolute";
     modal.style.top = "50%";
@@ -490,7 +495,6 @@ export function initUI() {
         popup.classList.remove("open");
       }
     });
-
   }
   createAssignModal();
 }
@@ -505,14 +509,14 @@ function renderPopupTable({ mode, id, period }) {
 
   tbody.innerHTML = "";
   if (mode === "employee") {
-  const employee = data.employees.find(
-    (e) => String(e.id) === String(employeeId),
-  );
+    const employee = data.employees.find(
+      (e) => String(e.id) === String(employeeId),
+    );
 
-  employee?.assignments?.forEach(a => {
-    const project = data.projects.find(p => p.id === a.projectId);
+    employee?.assignments?.forEach((a) => {
+      const project = data.projects.find((p) => p.id === a.projectId);
 
-    tbody.innerHTML += `
+      tbody.innerHTML += `
       <tr>
         <td>${project?.name}</td>
         <td>${a.capacity}</td>
@@ -521,17 +525,17 @@ function renderPopupTable({ mode, id, period }) {
         </td>
       </tr>
     `;
-  });
+    });
   }
   if (mode === "project") {
-    data.employees.forEach(emp => {
+    data.employees.forEach((emp) => {
       console.log("EMP:", e.name, e.assignments);
 
-    const assignment = emp.assignments?.find(a => a.projectId === id);
+      const assignment = emp.assignments?.find((a) => a.projectId === id);
 
-    if (!assignment) return;
+      if (!assignment) return;
 
-    tbody.innerHTML += `
+      tbody.innerHTML += `
       <tr>
         <td>${emp.name}</td>
         <td>${assignment.capacity}</td>
@@ -541,10 +545,9 @@ function renderPopupTable({ mode, id, period }) {
         </td>
       </tr>
     `;
-  });
+    });
+  }
 }
-}
-
 
 let currentProjectId = null;
 let currentPeriod = null;
@@ -566,3 +569,93 @@ export function refreshProjectPopup() {
 
   renderProjectEmployees(currentProjectId, currentPeriod);
 }
+
+function renderCalendar(year, month) {
+  const tbody = document.querySelector("#availabilitEmployeesBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let start = firstDay === 0 ? 6 : firstDay - 1;
+
+  let row = document.createElement("tr");
+
+  for (let i = 0; i < start; i++) {
+    row.innerHTML += `<td></td>`;
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    if ((start + day - 1) % 7 === 0) {
+      tbody.appendChild(row);
+      row = document.createElement("tr");
+    }
+
+    row.innerHTML += `<td class="calendar-day">${day}</td>`;
+  }
+
+  tbody.appendChild(row);
+}
+
+
+
+// function openAvailabilityPopup(employeeId, period) {
+//   const popup = document.querySelector("#availabilityPopup");
+//   if (!popup) return;
+
+//   popup.classList.add("open");
+
+//   const date = new Date();
+//   const year = date.getFullYear();
+//   const month = date.getMonth();
+
+//   renderCalendar(year, month);
+// }
+
+
+export function openAvailabilityPopup(employeeId, period) {
+  const popup = document.querySelector("#availabilityPopup");
+
+  if (!popup) return;
+
+  popup.classList.add("open");
+  document.documentElement.classList.add("lock");
+  document.body.classList.add("lock");
+
+  // заголовок (опционально)
+  const data = getData(period);
+  const emp = data.employees.find((e) => String(e.id) === String(employeeId));
+
+  document.querySelector("#availabilityPopupTitle").textContent =
+    `${emp?.name || "-"} Availability`;
+
+  // календарь
+  const now = new Date();
+  renderCalendar(now.getFullYear(), now.getMonth());
+}
+
+
+const availabilityPopup = document.querySelector("#availabilityPopup");
+const closeBtn = document.querySelector(".modal__close_availability");
+
+// крестик
+closeBtn.addEventListener("click", () => {
+  availabilityPopup.classList.remove("open");
+  document.documentElement.classList.remove("lock");
+  document.body.classList.remove("lock");
+});
+
+// клик по фону
+availabilityPopup.addEventListener("click", (e) => {
+  if (e.target === availabilityPopup) {
+    availabilityPopup.classList.remove("open");
+    document.documentElement.classList.remove("lock");
+    document.body.classList.remove("lock");
+  }
+});
+
+
+
+
