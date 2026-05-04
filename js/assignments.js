@@ -3,14 +3,17 @@
 import { getData, saveData } from "./storage.js";
 
 export function assignEmployeeToProject(period, employeeId, projectId) {
+  console.log("ASSIGN CALLED", employeeId, projectId);
   const data = getData(period);
 
-  const employee = data.employees.find((e) => String(e.id) === String(employeeId));
+  const employee = data.employees.find(
+    (e) => String(e.id) === String(employeeId),
+  );
 
-if (!employee) {
-  console.log("❌ EMPLOYEE NOT FOUND", employeeId);
-  return;
-}
+  if (!employee) {
+    console.log("STOP: no employee");
+    return;
+  }
   console.log("DATA:", getData(period));
   console.log("PROJECTS:", getData(period).projects);
 
@@ -20,9 +23,12 @@ if (!employee) {
 
   const norm = (v) => String(v);
   const exists = (employee.assignments || []).find(
-    (a) => norm(a.projectId) === norm(projectId)
+    (a) => norm(a.projectId) === norm(projectId),
   );
-  if (exists) return;
+  if (exists) {
+    console.log("STOP: already assigned");
+    return;
+  }
 
   const used = employee.assignments.reduce(
     (sum, a) => sum + Number(a.capacity),
@@ -31,22 +37,36 @@ if (!employee) {
 
   const newCapacity = 1;
 
+  // if (used + newCapacity > 1.5) {
+  //   alert("Employee capacity limit exceeded (1.5)");
+  //   return;
+  // }
+
   if (used + newCapacity > 1.5) {
-    alert("Employee capacity limit exceeded (1.5)");
+    console.log("STOP: capacity limit");
     return;
   }
 
   console.log("EMPLOYEE BEFORE PUSH:", employee);
+
+  if (!employee.assignments) {
+    employee.assignments = [];
+  }
+  console.log("BEFORE PUSH LINE");
   employee.assignments.push({
     projectId: norm(projectId),
     capacity: newCapacity,
     fit: 0.5,
   });
 
+  console.log(getData(period));
+  console.log("AFTER PUSH:", employee.assignments);
+
   console.log("AFTER ASSIGN:", employee.assignments);
   console.log("ALL EMPLOYEES:", data.employees);
 
   saveData(period, data);
+  console.log("SAVED:", loadAllData());
   console.log("RAW STORAGE:", localStorage.getItem("monthlyData"));
 }
 
@@ -68,4 +88,9 @@ export function getAvailability(emp) {
     used,
     available: 1.5 - used,
   };
+}
+
+export function getVacationCoefficient(emp) {
+  // пока заглушка
+  return 1;
 }

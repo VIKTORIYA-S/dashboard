@@ -2,6 +2,7 @@ import { getData } from "./storage.js";
 import { deleteEmployee } from "./employees.js";
 import { deleteProject } from "./projects.js";
 import { getAvailability, assignEmployeeToProject } from "./assignments.js";
+import { getVacationCoefficient } from "./assignments.js";
 
 let currentSortField = null;
 let sortDirection = "asc";
@@ -9,7 +10,7 @@ const norm = (v) => String(v);
 
 export function renderEmployees(period) {
   const data = getData(period);
-  // console.log(data);
+  console.log(period);
   const options = data.projects
     .map((p) => `<option value="${p.id}">${p.name}</option>`)
     .join("");
@@ -193,8 +194,8 @@ const norm = (v) => String(v);
 
       const capacity = Number(assignment.capacity) || 0;
       const fit = Number(assignment.fit) || 0;
-
-      const effective = capacity * fit;
+      const vacationCoef = getVacationCoefficient(emp);
+      const effective = capacity * fit * vacationCoef;
 
       // console.log({ capacity, fit, effective });
 
@@ -225,7 +226,7 @@ const norm = (v) => String(v);
       const projectId = btn.dataset.id;
 
        console.log("CLICK PROJECT ID:", projectId);
-      openEmployeesPopup(projectId, period);
+      // openEmployeesPopup(projectId, period);
       openProjectPopup(
     { id: projectId }, // 👈 ВАЖНО
     period
@@ -272,7 +273,7 @@ console.log("OPEN PROJECT:", project);
   document.querySelector("#projectPopupTitle").textContent =
     `Employees on ${project?.name || "-"}`;
 
-  popup.classList.remove("open");
+  // popup.classList.remove("open");
   renderProjectEmployees(projectId, period);
 }
 
@@ -333,6 +334,8 @@ function renderProjectEmployees(projectId, period) {
 export function renderEmployeeProjects(employeeId, period) {
   const data = getData(period);
 
+  console.log(data.employees);
+
   const tbody = document.querySelector("#employeeProjectsBody");
   tbody.innerHTML = "";
 
@@ -368,23 +371,23 @@ function openAssignmentsModal(emp, data) {
   modalTitle.textContent = `Projects of ${emp.name}`;
   modalTbody.innerHTML = "";
 
-  modalTbody.onclick = (e) => {
-    const btn = e.target.closest(".unassign-btn");
-    if (!btn) return;
+  // modalTbody.onclick = (e) => {
+  //   const btn = e.target.closest(".unassign-btn");
+  //   if (!btn) return;
 
-    const empId = btn.dataset.emp;
-    const projectId = btn.dataset.project;
+  //   const empId = btn.dataset.emp;
+  //   const projectId = btn.dataset.project;
 
-    removeAssignment(period, empId, projectId);
-    rerender();
+  //   removeAssignment(period, empId, projectId);
+  //   rerender();
 
-    openAssignmentsModal(
-      data.employees.find((e) => e.id === empId),
-      getData(period),
-    );
+  //   openAssignmentsModal(
+  //     data.employees.find((e) => e.id === empId),
+  //     getData(period),
+  //   );
 
-    modal.classList.remove("open");
-  };
+  //   modal.classList.remove("open");
+  // };
 
   if (!emp.assignments || emp.assignments.length === 0) {
     modalTbody.innerHTML = `<tr><td colspan="9">No assignments</td></tr>`;
@@ -437,6 +440,10 @@ export function initUI() {
   function createAssignModal() {
     const modal = document.createElement("div");
 
+    const popup = document.querySelector("#projectPopup");
+    const closeBtn = popup?.querySelector(".modal__close");
+
+
     modal.id = "assignModal";
     modal.style.position = "absolute";
     modal.style.top = "50%";
@@ -448,6 +455,19 @@ export function initUI() {
     modal.style.zIndex = "1000";
 
     document.body.appendChild(modal);
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => {
+        popup.classList.remove("open");
+      });
+    }
+
+    popup.addEventListener("click", (e) => {
+      if (e.target === popup) {
+        popup.classList.remove("open");
+      }
+    });
+
   }
   createAssignModal();
 }

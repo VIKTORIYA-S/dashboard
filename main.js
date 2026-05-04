@@ -34,6 +34,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const period = getCurrentPeriod();
     renderEmployees(period);
     renderProjects(period);
+
+    console.log(period);
   }
 
   window.rerender = rerender;
@@ -63,6 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: document.getElementById("empPosition").value,
       salary: Number(document.getElementById("empSalary").value),
       assignments: [],
+      vacationDays: Number(document.getElementById("empVacation")?.value) || 0,
     };
 
     console.log(employee);
