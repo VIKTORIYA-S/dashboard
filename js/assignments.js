@@ -18,9 +18,9 @@ export function assignEmployeeToProject(period, employeeId, projectId) {
   console.log("DATA:", getData(period));
   console.log("PROJECTS:", getData(period).projects);
 
-  if (!employee.assignments) {
-    employee.assignments = [];
-  }
+  // if (!employee.assignments) {
+  //   employee.assignments = [];
+  // }
 
   const norm = (v) => String(v);
   const exists = (employee.assignments || []).find(
@@ -66,8 +66,16 @@ export function assignEmployeeToProject(period, employeeId, projectId) {
   console.log("AFTER ASSIGN:", employee.assignments);
   console.log("ALL EMPLOYEES:", data.employees);
 
+  employee.assignments.push({
+    projectId: norm(projectId),
+    capacity: newCapacity,
+    fit: 0.5,
+  });
+
   saveData(period, data);
-  console.log("SAVED:", getllData(period));
+  rerender();
+  refreshEmployeePopup();
+  console.log("SAVED:", getData(period));
   console.log("RAW STORAGE:", localStorage.getItem("monthlyData"));
 }
 
@@ -97,3 +105,4 @@ export function getVacationCoefficient(emp) {
   // пока заглушка
   return 1;
 }
+

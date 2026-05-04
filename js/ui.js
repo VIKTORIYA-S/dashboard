@@ -26,8 +26,8 @@ export function renderEmployees(period) {
 
     if (showBtn) {
       const id = showBtn.dataset.id;
-      const emp = data.employees.find((emp) => emp.id === id);
-      openAssignmentsModal(emp, data);
+
+      openEmployeesPopup(id, period);
     }
 
     if (assignBtn) {
@@ -246,18 +246,26 @@ const norm = (v) => String(v);
 //   renderProjectEmployees(projectId, period);
 // }
 
-function openEmployeesPopup(emp, period) {
+export function openEmployeesPopup(employeeId, period) {
   const popup = document.querySelector("#employeesPopup");
 
   if (!popup) return;
 
   popup.classList.add("open");
 
-  document.querySelector("#employeePopupTitle").textContent =
-    `Assignment for ${emp.name}`;
+  const data = getData(period);
 
-  renderEmployeeProjects(emp.id, period);
+  const employee = data.employees.find(
+    (e) => String(e.id) === String(employeeId),
+  );
+
+  document.querySelector("#employeePopupTitle").textContent =
+    `Assignment for ${employee?.name || "-"}`;
+
+  renderEmployeeProjects(employeeId, period);
 }
+
+
 
 // function openProjectPopup(projectId, period) {
 //   const data = getData(period);
@@ -334,32 +342,47 @@ function renderProjectEmployees(projectId, period) {
 export function renderEmployeeProjects(employeeId, period) {
   const data = getData(period);
 
-  console.log(data.employees);
-
   const tbody = document.querySelector("#employeeProjectsBody");
   tbody.innerHTML = "";
 
   const employee = data.employees.find(
-  
-  (e) => String(e.id) === String(employeeId),
+    (e) => String(e.id) === String(employeeId),
   );
-  
+
   if (!employee?.assignments?.length) {
     tbody.innerHTML = `<tr><td colspan="3">No projects</td></tr>`;
     return;
   }
 
   employee.assignments.forEach((a) => {
-    const project = data.projects.find((p) => p.id === a.projectId);
+    const project = data.projects.find(
+      (p) => String(p.id) === String(a.projectId),
+    );
 
     tbody.innerHTML += `
       <tr>
         <td>${project?.name || "-"}</td>
         <td>${a.capacity || "-"}</td>
-        <td><button class="unassign-btn">Unassign</button></td>
+        <td>${a.fit || "-"}</td>
+        <td>${a.vacation || "-"}</td>
+
+        <td>
+          ${a.capacity && a.fit ? (a.capacity * a.fit).toFixed(2) : "-"}
+        </td>
+
+        <td>${a.revenue || "-"}</td>
+        <td>${a.cost || "-"}</td>
+        <td>${a.profit || "-"}</td>
+
+        <td>
+          <button class="unassign-btn"
+            data-emp="${employee.id}"
+            data-project="${a.projectId}">
+            Unassign
+          </button>
+        </td>
       </tr>
     `;
-
   });
 }
 
