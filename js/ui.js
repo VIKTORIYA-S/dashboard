@@ -74,23 +74,6 @@ export function renderEmployees(period) {
 
       openAvailabilityPopup(id, period);
     }
-
-    // const closeBtn = document.querySelector(".modal__close_availability");
-    // console.log(closeBtn);
-    // closeBtn.addEventListener("click", (e) => {
-    //   console.log("CLICK FIRED");
-    //   e.preventDefault();
-    //   if (e.target === closeBtn) {
-    //     popup.classList.remove("open");
-    //     document.documentElement.classList.remove("lock");
-    //     document.body.classList.remove("lock");
-    //   }
-    //   if (e.target === popup) {
-    //     popup.classList.remove("open");
-    //     document.documentElement.classList.remove("lock");
-    //     document.body.classList.remove("lock");
-    //   }
-    // });
   };
 
   data.employees.forEach((emp) => {
@@ -190,17 +173,11 @@ export function renderProjects(period) {
     const assignedEmployees = data.employees.filter((emp) =>
       emp.assignments?.some((a) => norm(a.projectId) === norm(project.id)),
     );
-    // console.log(assignedEmployees);
-    // console.log("ASSIGNED TO PROJECT:", assignedEmployees);
 
     const used = assignedEmployees.reduce((sum, emp) => {
       const assignment = emp.assignments.find(
         (a) => String(a.projectId) === String(project.id),
       );
-
-      // console.log("project.id:", project.id);
-      // console.log(data.employees.map((e) => e.assignments));
-      // console.log(data.employees.flatMap((e) => e.assignments));
 
       if (!assignment) return sum;
 
@@ -227,7 +204,6 @@ export function renderProjects(period) {
         `;
 
     tbody.appendChild(tr);
-    // console.log(data.projects);
   });
 
   tbody.onclick = null; // очистить старый
@@ -238,24 +214,14 @@ export function renderProjects(period) {
       const projectId = btn.dataset.id;
 
       console.log("CLICK PROJECT ID:", projectId);
-      // openEmployeesPopup(projectId, period);
       openProjectPopup(
-        { id: projectId }, // 👈 ВАЖНО
+        { id: projectId },
         period,
       );
     }
   };
 }
 
-// function openEmployeesPopup(projectId, period) {
-//   console.log("OPEN POPUP PERIOD:", period);
-//   console.log("PROJECT ID:", projectId);
-//   const popup = document.querySelector("#employeesPopup");
-
-//   popup.classList.add("open");
-
-//   renderProjectEmployees(projectId, period);
-// }
 
 export function openEmployeesPopup(employeeId, period) {
   const popup = document.querySelector("#employeesPopup");
@@ -270,38 +236,19 @@ export function openEmployeesPopup(employeeId, period) {
     (e) => String(e.id) === String(employeeId),
   );
 
+  console.log("OPEN EMPLOYEE:", employee);
+
   document.querySelector("#employeePopupTitle").textContent =
     `Assignment for ${employee?.name || "-"}`;
 
   renderEmployeeProjects(employeeId, period);
 }
 
-// function openProjectPopup(projectId, period) {
-//   const data = getData(period);
-
-//   const project = data.projects.find((p) => String(p.id) === String(projectId));
-// console.log("OPEN PROJECT:", project);
-//   const popup = document.querySelector("#projectPopup");
-
-//   if (!popup) return;
-
-//   popup.classList.add("open");
-
-//   document.querySelector("#projectPopupTitle").textContent =
-//     `Employees on ${project?.name || "-"}`;
-
-//   // popup.classList.remove("open");
-//   renderProjectEmployees(projectId, period);
-// }
 
 function renderProjectEmployees(projectId, period) {
   const data = getData(period);
 
   const norm = (v) => String(v);
-
-  // const employee = data.employees.find(
-  //   (e) => String(e.id) === String(employeeId),
-  // );
 
   const tbody = document.querySelector("#projectEmployeesBody");
 
@@ -317,12 +264,6 @@ function renderProjectEmployees(projectId, period) {
     tbody.innerHTML = `<tr><td colspan="9">No employees assigned</td></tr>`;
     return;
   }
-
-  // employee.assignments.forEach((a) => {
-  //   const project = data.projects.find(
-  //     (p) => String(p.id) === String(a.projectId),
-  //   );
-  //   if (!project) return;
 
   const rows = assignedEmployees
     .map((emp) => {
@@ -405,7 +346,7 @@ export function renderEmployeeProjects(employeeId, period) {
     `;
   });
 
-  
+
 }
 
 function openAssignmentsModal(emp, data) {
@@ -416,23 +357,6 @@ function openAssignmentsModal(emp, data) {
   modalTitle.textContent = `Projects of ${emp.name}`;
   modalTbody.innerHTML = "";
 
-  // modalTbody.onclick = (e) => {
-  //   const btn = e.target.closest(".unassign-btn");
-  //   if (!btn) return;
-
-  //   const empId = btn.dataset.emp;
-  //   const projectId = btn.dataset.project;
-
-  //   removeAssignment(period, empId, projectId);
-  //   rerender();
-
-  //   openAssignmentsModal(
-  //     data.employees.find((e) => e.id === empId),
-  //     getData(period),
-  //   );
-
-  //   modal.classList.remove("open");
-  // };
 
   if (!emp.assignments || emp.assignments.length === 0) {
     modalTbody.innerHTML = `<tr><td colspan="9">No assignments</td></tr>`;
@@ -611,6 +535,9 @@ export function renderCalendar(year, month, employee, period) {
       employee.vacationDays.push(day); // добавить день
     }
 
+    // ..........................................................
+    // ..........................................................
+
     // сохраняем изменения
     const data = getData(period);
     const emp = data.employees.find(
@@ -659,52 +586,6 @@ export function renderCalendar(year, month, employee, period) {
   updateVacationCounter(employee);
 }
 
-
-
-
-// export function openAvailabilityPopup(employeeId, period) {
-//   const popup = document.querySelector("#availabilityPopup");
-
-//   if (!popup) return;
-
-//   popup.classList.add("open");
-//   document.documentElement.classList.add("lock");
-//   document.body.classList.add("lock");
-
-//   // заголовок (опционально)
-//   const data = getData(period);
-
-//   const employee = data.employees.find(
-//     (e) => String(e.id) === String(employeeId),
-//   );
-
-//   console.log(employee);
-
-//   const index = employee.vacationDays.indexOf(day);
-
-//   if (index > -1) {
-//     employee.vacationDays.splice(index, 1);
-//   } else {
-//     employee.vacationDays.push(day);
-//   }
-
-//   saveData(period, data);
-
-//   const emp = data.employees.find((e) => String(e.id) === String(employeeId));
-
-//   console.log("FOUND EMPLOYEE:", employee);
-
-//   if (!employee) {
-//     console.log("❌ EMPLOYEE NOT FOUND");
-//     return;
-//   }
-
-//   popup.classList.add("open");
-
-//   const now = new Date();
-
-//   renderCalendar(now.getFullYear(), now.getMonth(), employee, period);
-// }
 
 
 export function openAvailabilityPopup(employeeId, period) {
@@ -785,12 +666,22 @@ tbody.onclick = (e) => {
 
 
 function updateVacationCounter(employee) {
-  const used = employee.vacationDays.length;
-  const total = 21; // или возьмите из employee.totalVacationDays, если храните
-  document.getElementById("vacationDays").textContent = used;
-  document.getElementById("totalVacationDays").textContent = total;
-}
+  const days = employee.vacationDays || [];
 
+  if (days.length === 0) {
+    document.getElementById("vacationDays").textContent = "00";
+    document.getElementById("totalVacationDays").textContent = "21";
+    return;
+  }
+
+  const sorted = [...days].sort((a, b) => a - b);
+
+  const firstDay = String(sorted[0]).padStart(2, "0");
+  const lastDay = String(sorted[sorted.length - 1]).padStart(2, "0");
+
+  document.getElementById("vacationDays").textContent = firstDay + "-";
+  document.getElementById("totalVacationDays").textContent = lastDay + ("(" +  sorted.length + ")");
+}
 
 
 const availabilityPopup = document.querySelector("#availabilityPopup");

@@ -545,10 +545,6 @@ label span {
     display: flex;
 }
 
-/* .popup_availability {
-    display: flex;
-} */
-
 .modal__wrapper_availability {
     width: 500px;
     height: auto;
@@ -600,3 +596,10 @@ h3 {
     border: 1px solid #fff;
 }
 
+#vacationDays {
+    color: rgb(2, 183, 183);
+}
+
+#totalVacationDays {
+    color: rgb(2, 183, 183);
+}

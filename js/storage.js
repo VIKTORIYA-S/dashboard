@@ -50,8 +50,6 @@ export function saveData(period, data) {
 
   monthlyData[period] = data;
 
-  console.log("SAVING PERIOD:", period);
-  console.log("DATA BEING SAVED:", data);
   saveAllData(monthlyData);
 }
 
