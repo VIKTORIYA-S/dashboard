@@ -22,3 +22,11 @@ export function toggleForm() {
         form1.classList.remove("open");
     });
 }
+
+
+const modalAvailabilityBtn = document.querySelector(".modal__availability-btn");
+
+modalAvailabilityBtn.addEventListener("click", () => {
+    const modal = document.querySelector(".popup_availability");
+    modal.classList.remove("open");
+});

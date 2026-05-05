@@ -606,3 +606,7 @@ h3 {
     font-weight: bold;
     color: rgb(2, 183, 183);
 }
+
+.modal__availability-btn.open {
+    display: block;
+}
