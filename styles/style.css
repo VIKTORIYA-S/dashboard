@@ -576,7 +576,9 @@ h3 {
     margin-top: 20px;
 }
 
-.modal__availability-btn {
+.modal__availability-btn,
+#projectSelect,
+#confirmAssign {
     background: #410032;
     color: #fff;
     padding: 10px 20px;
@@ -596,10 +598,11 @@ h3 {
     border: 1px solid #fff;
 }
 
-#vacationDays {
-    color: rgb(2, 183, 183);
-}
-
-#totalVacationDays {
+#vacationDays,
+#totalWorkingDays,
+#totalVacationDays,
+#workingDays,
+#availabilityPopupPeriod {
+    font-weight: bold;
     color: rgb(2, 183, 183);
 }

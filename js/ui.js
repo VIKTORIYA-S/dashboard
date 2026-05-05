@@ -634,9 +634,13 @@ export function openAvailabilityPopup(employeeId, period) {
     periodEl.textContent = `${monthName} ${year}`;
   }
 
+  const valueMonth = Number(document.getElementById("month").value) - 1; // 0–11
+  const valueYear = Number(document.getElementById("year").value);
+
+  updateWorkingDays(valueYear, valueMonth);
+
   renderCalendar(year, month - 1, employee, period);
 }
-
 
 
 const tbody = document.querySelector("#availabilityPopup table tbody");
@@ -702,6 +706,24 @@ availabilityPopup.addEventListener("click", (e) => {
     document.body.classList.remove("lock");
   }
 });
+
+
+function updateWorkingDays(year, month) {
+  // month: 0–11
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  let workingDays = 0;
+
+  for (let day = 1; day <= totalDays; day++) {
+    const d = new Date(year, month, day);
+    const weekday = d.getDay(); // 0 = Sunday, 6 = Saturday
+    if (weekday !== 0 && weekday !== 6) {
+      workingDays++;
+    }
+  }
+
+  document.getElementById("workingDays").textContent = workingDays;
+  document.getElementById("totalWorkingDays").textContent = totalDays;
+}
 
 
 
