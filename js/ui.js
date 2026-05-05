@@ -705,15 +705,41 @@ export function openAvailabilityPopup(employeeId, period) {
   );
   if (!employee) return;
 
-  updateVacationCounter(employee);
+  const monthSelect = document.getElementById("month");
+  const yearSelect = document.getElementById("year");
+  const month = Number(monthSelect.value);
+  const year = Number(yearSelect.value);
+  console.log("MONTH", month, "YEAR", year);
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const monthName = monthNames[month - 1];
+
+   const titleEl = document.getElementById("availabilityPopupTitle");
+   if (titleEl) {
+     titleEl.textContent = `${employee.name} - Availability`;
+  }
   
-  const titleEl = document.getElementById("availabilityPopupTitle");
-  if (titleEl) {
-    titleEl.textContent = `${employee.name} - Availability`;
+  const periodEl = document.getElementById("availabilityPopupPeriod");
+  if (periodEl) {
+    periodEl.textContent = `${monthName} ${year}`;
   }
 
-  const now = new Date();
-  renderCalendar(now.getFullYear(), now.getMonth(), employee, period);
+  // updateVacationCounter(employee);
+  // const now = new Date();
+  renderCalendar(year, month - 1, employee, period);
 }
 
 
@@ -745,7 +771,6 @@ tbody.onclick = (e) => {
 
 
 function updateVacationCounter(employee) {
-  console.log(employee);
   const used = employee.vacationDays.length;
   const total = 21; // или возьмите из employee.totalVacationDays, если храните
   document.getElementById("vacationDays").textContent = used;
