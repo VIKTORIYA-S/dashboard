@@ -11,21 +11,19 @@ function saveAllData(data) {
 }
 
 
-// получить данные месяца
-// export function getData(period) {
-//   const all = loadAllData();
-//   return all[period] || { employees: [], projects: [] };
-// }
 export function getData(period) {
-  // console.log("DATA:", getData(period));
-  // console.log("PROJECTS:", getData(period).projects);
   const monthlyData = loadAllData();
-
   const data = monthlyData[period];
 
   if (!data) {
     return { employees: [], projects: [] };
   }
+
+  data.employees.forEach((e) => {
+    if (!Array.isArray(e.vacationDays)) {
+      e.vacationDays = [];
+    }
+  });
 
   return {
     employees: data.employees ?? [],

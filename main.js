@@ -57,6 +57,9 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", (e) => {
     e.preventDefault(); // ❗ убираем перезагрузку
 
+    const vacationCount =
+      Number(document.getElementById("empVacation")?.value) || 0;
+
     const employee = {
       id: Date.now().toString(),
       name: document.getElementById("empName").value,
@@ -65,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       position: document.getElementById("empPosition").value,
       salary: Number(document.getElementById("empSalary").value),
       assignments: [],
-      vacationDays: Number(document.getElementById("empVacation")?.value) || 0,
+      vacationDays: Array.from({ length: vacationCount }, (_, i) => i + 1),
     };
 
     addEmployee(getCurrentPeriod(), employee);

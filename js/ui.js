@@ -1,4 +1,4 @@
-import { getData } from "./storage.js";
+import { getData, saveData } from "./storage.js";
 import { deleteEmployee } from "./employees.js";
 import { deleteProject } from "./projects.js";
 import { getAvailability, assignEmployeeToProject } from "./assignments.js";
@@ -75,22 +75,22 @@ export function renderEmployees(period) {
       openAvailabilityPopup(id, period);
     }
 
-    const closeBtn = document.querySelector(".modal__close_availability");
-    console.log(closeBtn);
-    closeBtn.addEventListener("click", (e) => {
-      console.log("CLICK FIRED");
-      e.preventDefault();
-      if (e.target === closeBtn) {
-        popup.classList.remove("open");
-        document.documentElement.classList.remove("lock");
-        document.body.classList.remove("lock");
-      }
-      if (e.target === popup) {
-        popup.classList.remove("open");
-        document.documentElement.classList.remove("lock");
-        document.body.classList.remove("lock");
-      }
-    });
+    // const closeBtn = document.querySelector(".modal__close_availability");
+    // console.log(closeBtn);
+    // closeBtn.addEventListener("click", (e) => {
+    //   console.log("CLICK FIRED");
+    //   e.preventDefault();
+    //   if (e.target === closeBtn) {
+    //     popup.classList.remove("open");
+    //     document.documentElement.classList.remove("lock");
+    //     document.body.classList.remove("lock");
+    //   }
+    //   if (e.target === popup) {
+    //     popup.classList.remove("open");
+    //     document.documentElement.classList.remove("lock");
+    //     document.body.classList.remove("lock");
+    //   }
+    // });
   };
 
   data.employees.forEach((emp) => {
@@ -570,71 +570,183 @@ export function refreshProjectPopup() {
   renderProjectEmployees(currentProjectId, currentPeriod);
 }
 
-function renderCalendar(year, month) {
+export function renderCalendar(year, month, employee, period) {
   const tbody = document.querySelector("#availabilitEmployeesBody");
   if (!tbody) return;
 
   tbody.innerHTML = "";
 
+  // обработчик кликов по дням
+  tbody.onclick = (e) => {
+    const cell = e.target.closest(".calendar-day");
+    if (!cell) return;
+
+    const day = Number(cell.dataset.day);
+
+    if (!employee.vacationDays) {
+      employee.vacationDays = [];
+    }
+
+    const index = employee.vacationDays.indexOf(day);
+
+    if (index > -1) {
+      employee.vacationDays.splice(index, 1); // убрать день
+    } else {
+      employee.vacationDays.push(day); // добавить день
+    }
+
+    // сохраняем изменения
+    const data = getData(period);
+    const emp = data.employees.find(
+      (e) => String(e.id) === String(employee.id),
+    );
+    if (emp) {
+      emp.vacationDays = employee.vacationDays;
+      saveData(period, data);
+    }
+
+    // перерисовываем календарь и обновляем счётчик
+    renderCalendar(year, month, employee, period);
+    updateVacationCounter(employee);
+  };
+
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   let start = firstDay === 0 ? 6 : firstDay - 1;
-
   let row = document.createElement("tr");
 
+  // пустые ячейки до первого дня
   for (let i = 0; i < start; i++) {
     row.innerHTML += `<td></td>`;
   }
 
+  // дни месяца
   for (let day = 1; day <= daysInMonth; day++) {
     if ((start + day - 1) % 7 === 0) {
       tbody.appendChild(row);
       row = document.createElement("tr");
     }
 
-    row.innerHTML += `<td class="calendar-day">${day}</td>`;
+    const isVacation = employee.vacationDays?.includes(day);
+
+    row.innerHTML += `
+      <td class="calendar-day ${isVacation ? "vacation" : ""}" data-day="${day}">
+        ${day}
+      </td>
+    `;
   }
 
   tbody.appendChild(row);
+
+  // обновляем счётчик при рендере
+  updateVacationCounter(employee);
 }
 
 
 
-// function openAvailabilityPopup(employeeId, period) {
+
+// export function openAvailabilityPopup(employeeId, period) {
 //   const popup = document.querySelector("#availabilityPopup");
+
 //   if (!popup) return;
 
 //   popup.classList.add("open");
+//   document.documentElement.classList.add("lock");
+//   document.body.classList.add("lock");
 
-//   const date = new Date();
-//   const year = date.getFullYear();
-//   const month = date.getMonth();
+//   // заголовок (опционально)
+//   const data = getData(period);
 
-//   renderCalendar(year, month);
+//   const employee = data.employees.find(
+//     (e) => String(e.id) === String(employeeId),
+//   );
+
+//   console.log(employee);
+
+//   const index = employee.vacationDays.indexOf(day);
+
+//   if (index > -1) {
+//     employee.vacationDays.splice(index, 1);
+//   } else {
+//     employee.vacationDays.push(day);
+//   }
+
+//   saveData(period, data);
+
+//   const emp = data.employees.find((e) => String(e.id) === String(employeeId));
+
+//   console.log("FOUND EMPLOYEE:", employee);
+
+//   if (!employee) {
+//     console.log("❌ EMPLOYEE NOT FOUND");
+//     return;
+//   }
+
+//   popup.classList.add("open");
+
+//   const now = new Date();
+
+//   renderCalendar(now.getFullYear(), now.getMonth(), employee, period);
 // }
 
 
 export function openAvailabilityPopup(employeeId, period) {
+
   const popup = document.querySelector("#availabilityPopup");
-
   if (!popup) return;
-
   popup.classList.add("open");
   document.documentElement.classList.add("lock");
   document.body.classList.add("lock");
 
-  // заголовок (опционально)
   const data = getData(period);
-  const emp = data.employees.find((e) => String(e.id) === String(employeeId));
+  const employee = data.employees.find(
+    (e) => String(e.id) === String(employeeId),
+  );
+  if (!employee) return;
 
-  document.querySelector("#availabilityPopupTitle").textContent =
-    `${emp?.name || "-"} Availability`;
+    updateVacationCounter(employee);
 
-  // календарь
   const now = new Date();
-  renderCalendar(now.getFullYear(), now.getMonth());
+  renderCalendar(now.getFullYear(), now.getMonth(), employee, period);
 }
+
+
+
+const tbody = document.querySelector("#availabilityPopup table tbody");
+tbody.onclick = (e) => {
+  const cell = e.target.closest("td");
+  if (!cell) return;
+  const day = Number(cell.dataset.day);
+
+  const data = getData(period);
+  const employee = data.employees.find(
+    (emp) => String(emp.id) === String(employeeId),
+  );
+
+  if (!employee) return;
+
+  const index = employee.vacationDays.indexOf(day);
+  if (index > -1) {
+    employee.vacationDays.splice(index, 1);
+  } else {
+    employee.vacationDays.push(day);
+  }
+
+  saveData(period, data);
+  updateVacationCounter(employee);
+  renderCalendar(year, month, employee, period);
+};
+
+
+function updateVacationCounter(employee) {
+  console.log(employee);
+  const used = employee.vacationDays.length;
+  const total = 21; // или возьмите из employee.totalVacationDays, если храните
+  document.getElementById("vacationDays").textContent = used;
+  document.getElementById("totalVacationDays").textContent = total;
+}
+
 
 
 const availabilityPopup = document.querySelector("#availabilityPopup");
