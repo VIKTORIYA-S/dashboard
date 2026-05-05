@@ -705,7 +705,12 @@ export function openAvailabilityPopup(employeeId, period) {
   );
   if (!employee) return;
 
-    updateVacationCounter(employee);
+  updateVacationCounter(employee);
+  
+  const titleEl = document.getElementById("availabilityPopupTitle");
+  if (titleEl) {
+    titleEl.textContent = `${employee.name} - Availability`;
+  }
 
   const now = new Date();
   renderCalendar(now.getFullYear(), now.getMonth(), employee, period);

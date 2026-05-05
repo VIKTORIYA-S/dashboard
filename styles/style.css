@@ -594,8 +594,9 @@ h3 {
 }
 
 .calendar-day.vacation {
-    background: #f39c12;
+    background: #67004f;
     color: white;
     border-radius: 6px;
+    border: 1px solid #fff;
 }
 
