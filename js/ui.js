@@ -299,6 +299,10 @@ function renderProjectEmployees(projectId, period) {
 
   const norm = (v) => String(v);
 
+  // const employee = data.employees.find(
+  //   (e) => String(e.id) === String(employeeId),
+  // );
+
   const tbody = document.querySelector("#projectEmployeesBody");
 
   if (!tbody) return;
@@ -314,6 +318,12 @@ function renderProjectEmployees(projectId, period) {
     return;
   }
 
+  // employee.assignments.forEach((a) => {
+  //   const project = data.projects.find(
+  //     (p) => String(p.id) === String(a.projectId),
+  //   );
+  //   if (!project) return;
+
   const rows = assignedEmployees
     .map((emp) => {
       const a = emp.assignments.find(
@@ -325,7 +335,7 @@ function renderProjectEmployees(projectId, period) {
           <td>${emp.name}</td>
           <td>${a.capacity}</td>
           <td>${a.fit}</td>
-          <td>-</td>
+          <td>${emp.vacationDays?.length || 0}</td>
           <td>${(a.capacity * a.fit).toFixed(2)}</td>
           <td>-</td>
           <td>-</td>
@@ -340,10 +350,11 @@ function renderProjectEmployees(projectId, period) {
         </tr>
       `;
     })
-    .join("");
 
+      .join("");
   tbody.innerHTML = rows;
-}
+  }
+
 
 export function renderEmployeeProjects(employeeId, period) {
   const data = getData(period);
@@ -364,13 +375,16 @@ export function renderEmployeeProjects(employeeId, period) {
     const project = data.projects.find(
       (p) => String(p.id) === String(a.projectId),
     );
+    if (!project) return;
+
+    const tbody = document.getElementById("employeeProjectsBody");
 
     tbody.innerHTML += `
       <tr>
         <td>${project?.name || "-"}</td>
         <td>${a.capacity || "-"}</td>
         <td>${a.fit || "-"}</td>
-        <td>${a.vacation || "-"}</td>
+        <td>${employee.vacationDays?.length || 0}</td>
 
         <td>
           ${a.capacity && a.fit ? (a.capacity * a.fit).toFixed(2) : "-"}
@@ -390,6 +404,8 @@ export function renderEmployeeProjects(employeeId, period) {
       </tr>
     `;
   });
+
+  
 }
 
 function openAssignmentsModal(emp, data) {
@@ -731,14 +747,12 @@ export function openAvailabilityPopup(employeeId, period) {
    if (titleEl) {
      titleEl.textContent = `${employee.name} - Availability`;
   }
-  
+
   const periodEl = document.getElementById("availabilityPopupPeriod");
   if (periodEl) {
     periodEl.textContent = `${monthName} ${year}`;
   }
 
-  // updateVacationCounter(employee);
-  // const now = new Date();
   renderCalendar(year, month - 1, employee, period);
 }
 
